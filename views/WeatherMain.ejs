@@ -97,18 +97,116 @@
             curLocation: "定位中"
         }
     });
+    var hoursData = new Array(24);
 
-    (function () {
+    var cityName = new Promise(resolve => {
         if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition(
                 position => {
                     fetch("/getCityName?latitude=" + position.coords.latitude + "&longitude=" + position.coords.longitude)
                     .then(
+                        response => {
+                            return response.json();
+                        }
+                    ).then(
+                        cityData => {
+                            locationApp.curLocation = cityData.results[0].name;
+                            resolve(cityData.results[0].id);
+                        }
+                    )
+                }
+            )
+        }
+    });
+
+    //Chart
+    const date = new Date();
+    const label = new Array(24);
+    let i;
+    for(i = 0; i < 24; i++){
+        label[i] = (date.getHours() + i) % 24 +":00"
+    }
+
+    var ChartData = {
+        labels: label,
+        datasets: [
+            {
+                label: "温度",
+                backgroundColor: "rgba(255,90,0,0.3)",
+            },
+            {
+                label: "湿度",
+                backgroundColor: "rgba(0,153,255,0.3)",
+            }
+        ]
+    };
+
+    function drawChart(temData, humData){
+        ChartData.datasets[0].data = temData;
+        ChartData.datasets[1].data = humData;
+        const ctx = document.getElementById("temperature-chart").getContext("2d");
+        new Chart(ctx, {
+            type: 'line',
+            data: ChartData
+        })
+    }
+
+    cityName.then(
+        cityID => {
+            fetch("/get24?cityID=" + cityID)
+            .then(
+                response => {
+                    return response.json();
+                }
+            ).then(
+                charJson => {
+                    const temData = new Array(24);
+                    const humData = new Array(24);
+                    for(let i = 0; i<24; i++){
+                        temData[i] = charJson.results[0].hourly[i].temperature;
+                        humData[i] = charJson.results[0].hourly[i].humidity;
+                    }
+                    drawChart(temData, humData);
+                }
+            )
+        }
+    )
+
+            /*
+    (function () {
+        if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    cityPromise = fetch("/getCityName?latitude=" + position.coords.latitude + "&longitude=" + position.coords.longitude)
+                    .then(
                         response => {return response.json()}
                     ).then(
                         cityName => {
                             locationApp.curLocation = cityName.results[0].name;
-                            cityID = cityName.results[0].id;
+                            return  cityName.results[0].id;
+                        }
+                    ).then(
+                        cityID => {
+                            fetch("/get24?cityID=" + cityID)
+                                .then(response => {
+                                return response.json();
+                                }).then(
+                                hoursDatas => {
+                                    var temData = new Array(24);
+                                    var humData = new Array(24);
+                                    for(let i = 0; i < 24; i++){
+                                        temData[i] = hoursDatas.results[0].hourly[i].temperature;
+                                        humData[i] = hoursDatas.results[0].hourly[i].humidity;
+                                    }
+                                    TemperatureData.datasets[0].data = temData;
+                                    TemperatureData.datasets[1].data = humData;
+                                    temperatureChart = new Chart(ctx, {
+                                        type: 'line',
+                                        data: TemperatureData
+                                    })
+                                }
+                            )
+                            return 88;
                         }
                     )
                 }
@@ -118,31 +216,9 @@
             );
         }
     })();
+    */
 
 
-    //chart
-    var date = new Date();
-    var lable = new Array(24);
-    let i;
-    for(i = 0; i < 24; i++){
-        lable[i] = (date.getHours() + i) % 24 +":00"
-    }
-
-    var ctx = document.getElementById("temperature-chart").getContext("2d");
-    var data = {
-        labels: lable,
-        datasets: [
-            {
-                label: "温度",
-                backgroundColor: "rgba(255,90,0,0.3)",
-                data: [65, 59, 80, 81, 56, 55, 40, 20, 30, 40 ,50, 30,42,12, 21,13,13,43,54,34,28,36,24,16]
-            }
-        ]
-    };
-    var myNewChart = new Chart(ctx, {
-        type: 'line',
-        data: data
-    });
 </script>
 </body>
 </html>

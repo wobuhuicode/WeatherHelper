@@ -14,7 +14,6 @@ router.get('/getCityName', function (req, res, next) {
     response.setEncoding('utf-8');
     response.on('data', data => {
       let my = JSON.parse(data);
-      my.results[0].name;
       res.json(my);
     })
   })
@@ -23,5 +22,19 @@ router.get('/getCityName', function (req, res, next) {
     console.log(err.message);
   })
 });
+
+router.get('/get24', function (req, res, next) {
+  let url = 'https://api.seniverse.com/v3/weather/hourly.json?key=SuGIvEHwK8b1Ed0nY&location=' + req.query.cityID + '&language=zh-Hans&unit=c&start=0&hours=24';
+  const httpReq = https.get(url, res1 => {
+    let hourlyData = '';
+    res1.setEncoding('utf-8');
+    res1.on('data', chunk => {
+      hourlyData += chunk;
+    })
+    res1.on('end', ()=>{
+      res.json(JSON.parse(hourlyData));
+    })
+  });
+})
 
 module.exports = router;
