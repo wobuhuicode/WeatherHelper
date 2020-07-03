@@ -37,4 +37,17 @@ router.get('/get24', function (req, res, next) {
   });
 })
 
+router.get("/weather", (req, res) => {
+  let url = "https://api.seniverse.com/v3/weather/now.json?key=SuGIvEHwK8b1Ed0nY&location=" + req.query.cityID + "&language=zh-Hans&unit=c";
+  let httpsReq = https.get(url, res1 => {
+    let weatherData = "";
+    res1.setEncoding('utf-8');
+    res1.on('data', chunk => { weatherData += chunk; });
+    res1.on('end', () => {res.json(JSON.parse(weatherData))});
+  })
+})
+
+router.get("/3days", (req, res) => {
+  let url = "https://api.seniverse.com/v3/weather/daily.json?key=SuGIvEHwK8b1Ed0nY&location=beijing&language=zh-Hans&unit=c&start=1&days=3"
+})
 module.exports = router;
