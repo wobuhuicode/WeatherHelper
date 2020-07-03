@@ -97,12 +97,14 @@
             curLocation: "定位中"
         }
     });
-    var hoursData = new Array(24);
 
+    var hoursData = new Array(24);
     var cityName = new Promise(resolve => {
+        alert("获取定中");
         if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition(
                 position => {
+                    alert("获取定位cg");
                     fetch("/getCityName?latitude=" + position.coords.latitude + "&longitude=" + position.coords.longitude)
                     .then(
                         response => {
@@ -116,6 +118,8 @@
                     )
                 }
             )
+        }else {
+            alert("获取定位失败");
         }
     });
 
