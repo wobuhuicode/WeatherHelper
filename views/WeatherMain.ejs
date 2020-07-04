@@ -16,39 +16,37 @@
             当前定位：{{curLocation}}
         </p>
     </div>
-    <div class="container card-frame mt-0">
-        <div class="row">
-            日期
+    <div class="card-frame mt-0 card text-white bg-success mb-3" id="weather-pane">
+        <div class="card-header">
+            {{curDate}}
         </div>
-        <div class="row">
-            <div class="col-4">
-                天气图标
+        <div class="card-body container" style="text-align: center">
+            <div class="row">
+                <div class="col-4" >
+                    <p v-if="!ifImageExist">正在获取</p>
+                    <img class="mb-3" v-if="ifImageExist" v-bind:src= "imageSrc" />
+                </div>
+                <div class="col-4" style="font-size: 60px">
+                    {{curTemperature}}
+                </div>
+                <div class="col-4" style="font-size: 20px">
+                  {{curWeather}}
+                </div>
             </div>
-            <div class="col-4">
-                温度
-            </div>
-            <div class="col-4">
-                天气详情
-            </div>
-        </div>
-        <div class="row" style="border-top-style: groove">
-            <div class="col-4" style="border-right-style: groove">
-                最近3天天气
+            <div class="row" style="border-top-style: solid; border-top-color: aliceblue">
+                <div class="col-4">
+                    最近3天天气
 
-            </div>
-            <div class="col-4" style="border-right-style: groove">
-                最近3天天气
-            </div>
-            <div class="col-4">
-                最近3天天气
+                </div>
+                <div class="col-4">
+                    最近3天天气
+                </div>
+                <div class="col-4">
+                    最近3天天气
+                </div>
             </div>
         </div>
-        <div class="row" style="border-top-style: groove">
-             <div class="col-4" style="border-right-style: groove">
-                 <iframe width="150" scrolling="no" height="65"  frameborder="0" allowtransparency="true" src=" https://api.seniverse.com/v3/weather/now.json?key=S-g6Gf70hb0xtIbOD&location=beijing&language=zh-Hans&unit=c&start=0&days=2">
-                 </iframe>
-             </div>
-        </div>
+
     </div>
     <div class="container card-frame mt-0">
         <div class="row">
@@ -68,16 +66,18 @@
                         <a class="nav-link active" href="#temperature-pane" data-toggle="tab" >温度</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-toggle="tab" >湿度</a>
+                        <a class="nav-link" href="#humidity-pane" data-toggle="tab" >湿度</a>
                     </li>
                 </ul>
             </div>
             <div class="card-body">
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="temperature-pane">
-                        <canvas id="temperature-chart" width="450" height="400"></canvas>
+                        <canvas id="temperature-chart" width="480" height="280"></canvas>
                     </div>
-                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+                    <div class="tab-pane fade" id="humidity-pane">
+                        <canvas id="humidity-chart" width="480" height="280"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,8 +97,8 @@
             curLocation: "定位中"
         }
     });
-    var hoursData = new Array(24);
 
+    var hoursData = new Array(24);
     var cityName = new Promise(resolve => {
         if(navigator.geolocation){
             navigator.geolocation.getCurrentPosition(
@@ -116,6 +116,8 @@
                     )
                 }
             )
+        }else {
+            alert("获取定位失败");
         }
     });
     
@@ -127,13 +129,19 @@
         label[i] = (date.getHours() + i) % 24 +":00"
     }
 
-    var ChartData = {
+    var temData = {
         labels: label,
         datasets: [
             {
                 label: "温度",
                 backgroundColor: "rgba(255,90,0,0.3)",
-            },
+            }
+        ]
+    };
+
+    var humData = {
+        labels: label,
+        datasets: [
             {
                 label: "湿度",
                 backgroundColor: "rgba(0,153,255,0.3)",
@@ -141,13 +149,32 @@
         ]
     };
 
-    function drawChart(temData, humData){
-        ChartData.datasets[0].data = temData;
-        ChartData.datasets[1].data = humData;
-        const ctx = document.getElementById("temperature-chart").getContext("2d");
-        new Chart(ctx, {
+    function drawChart(temDatas, humDatas){
+        temData.datasets[0].data = temDatas;
+        let datas = temDatas.slice();
+        datas.sort((a, b) => {return a-b;});
+        humData.datasets[0].data = humDatas;
+        const ctx1 = document.getElementById("temperature-chart").getContext("2d");
+        const ctx2 = document.getElementById("humidity-chart").getContext("2d");
+        new Chart(ctx1, {
             type: 'line',
-            data: ChartData
+            data: temData,
+            options: {
+                scales:{
+                    yAxes:[
+                        {
+                            ticks: {
+                                min: datas[0] - 3,
+                                max: parseInt(datas[datas.length-1]) + 3,
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+        new Chart(ctx2, {
+            type: 'line',
+            data: humData
         })
     }
 
@@ -167,6 +194,70 @@
                         humData[i] = charJson.results[0].hourly[i].humidity;
                     }
                     drawChart(temData, humData);
+                }
+            );
+        }
+    );
+
+    //weather
+    var curDate = new Date();
+    switch (curDate.getDay()) {
+        case 1: curDate.curWeekDay = "星期一"; break;
+        case 2: curDate.curWeekDay = "星期二"; break;
+        case 3: curDate.curWeekDay = "星期三"; break;
+        case 4: curDate.curWeekDay = "星期四"; break;
+        case 5: curDate.curWeekDay = "星期五"; break;
+        case 6: curDate.curWeekDay = "星期六"; break;
+        case 7: curDate.curWeekDay = "星期日"; break;
+    }
+    curDate.toDateString();
+    var curTemperature;
+    var weatherPane = new Vue({
+        el: "#weather-pane",
+        data: {
+            curDate: curDate.toLocaleDateString() + "   " + curDate.curWeekDay,
+            ifImageExist: false,
+            imageSrc: "",
+            curTemperature:"正在获取",
+        }
+    });
+
+    cityName.then(
+        cityID => {
+            fetch("/weather?cityID=" + cityID)
+                .then(
+                    response => {
+                        return response.json();
+                    }
+                ).then(
+                weatherJson => {
+                    weatherPane.imageSrc = "/images/" + weatherJson.results[0].now.code + "@2x.png";
+                    weatherPane.ifImageExist = true;
+                    weatherPane.curTemperature = weatherJson.results[0].now.temperature + "℃";
+                    weatherPane.curWeather = weatherJson.results[0].low + "℃~" + weatherJson.results[0].high + "℃";
+                }
+            )
+        }
+    )
+
+    var curWeather;
+    var weather = new Vue({
+        //el:"#weather-pane",
+        data: {
+            curWeather:"正在获取"
+        }
+    });
+
+    cityName.then(
+        cityID => {
+            fetch("/weatherDaily?cityID=" + cityID)
+                .then(
+                    response => {
+                        return response.json();
+                    }
+                ).then(
+                weatherJson => {
+                    weather.curWeather = weatherJson.results[0].low + "℃~" + weatherJson.results[0].high + "℃";
                 }
             )
         }

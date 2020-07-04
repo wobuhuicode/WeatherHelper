@@ -7,11 +7,6 @@ body {
 
 .card-frame{
     width: 500px;
-    background-color: azure;
     margin-top: 26px;
     margin-bottom: 26px;
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;
-    border-radius: 2px;
 }
