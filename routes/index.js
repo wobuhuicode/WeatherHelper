@@ -52,7 +52,6 @@ router.get("/weather", (req, res) => {
 });
 
 router.get("/weatherDaily", (req, res) => {
-  let url = "https://api.seniverse.com/v3/weather/daily.json?key=SuGIvEHwK8b1Ed0nY&location="+ req.query.cityID +"&language=zh-Hans&unit=c";
   let url = "https://api.seniverse.com/v3/weather/daily.json?key=SuGIvEHwK8b1Ed0nY&location="+ req.query.cityID +"&language=zh-Hans&unit=c&start=0&days=4";
   let httpsRer = https.get(url, res2 => {
     let weatherData = "";
