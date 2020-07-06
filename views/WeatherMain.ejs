@@ -30,19 +30,23 @@
                     {{curTemperature}}
                 </div>
                 <div class="col-4" style="font-size: 20px">
-                  {{curWeather}}
+                        {{curTemperatureRange}}
+                    <br/>
+                        {{curWeather}}
+                    <br/>
+                        {{curWind}}
+
                 </div>
             </div>
             <div class="row" style="border-top-style: solid; border-top-color: aliceblue">
                 <div class="col-4">
-                    最近3天天气
-
+                    {{tomorrow}}
                 </div>
                 <div class="col-4">
-                    最近3天天气
+                    {{aftertomorrow}}
                 </div>
                 <div class="col-4">
-                    最近3天天气
+                    {{bigaftertomorrow}}
                 </div>
             </div>
         </div>
@@ -219,6 +223,12 @@
             ifImageExist: false,
             imageSrc: "",
             curTemperature:"正在获取",
+            curTemperatureRange:"正在获取",
+            curWeather:"正在获取",
+            curWind:"正在获取",
+            tomorrow:"正在获取",
+            aftertomorrow:"正在获取",
+            bigaftertomorrow:"正在获取"
         }
     });
 
@@ -234,19 +244,8 @@
                     weatherPane.imageSrc = "/images/" + weatherJson.results[0].now.code + "@2x.png";
                     weatherPane.ifImageExist = true;
                     weatherPane.curTemperature = weatherJson.results[0].now.temperature + "℃";
-                    weatherPane.curWeather = weatherJson.results[0].low + "℃~" + weatherJson.results[0].high + "℃";
-                }
-            )
-        }
-    )
-
-    var curWeather;
-    var weather = new Vue({
-        //el:"#weather-pane",
-        data: {
-            curWeather:"正在获取"
-        }
-    });
+                });
+        });
 
     cityName.then(
         cityID => {
@@ -257,11 +256,15 @@
                     }
                 ).then(
                 weatherJson => {
-                    weather.curWeather = weatherJson.results[0].low + "℃~" + weatherJson.results[0].high + "℃";
-                }
-            )
-        }
-    )
+                    weatherPane.curTemperatureRange=weatherJson.results[0].daily[0].low + "℃~" + weatherJson.results[0].daily[0].high + "℃";
+                    weatherPane.curWeather = weatherJson.results[0].daily[0].text_day;
+                    weatherPane.curWind=weatherJson.results[0].daily[0].wind_direction+"风";
+                    weatherPane.tomorrow=weatherJson.results[0].daily[1].date+"\n"+weatherJson.results[0].daily[1].low + "℃~" + weatherJson.results[0].daily[1].high + "℃";
+                    weatherPane.aftertomorrow=weatherJson.results[0].daily[2].date+"\n"+weatherJson.results[0].daily[2].low + "℃~" + weatherJson.results[0].daily[2].high + "℃";
+                    weatherPane.bigaftertomorrow=weatherJson.results[0].daily[3].date+"\n"+weatherJson.results[0].daily[3].low + "℃~" + weatherJson.results[0].daily[3].high + "℃";
+
+                })
+        });
 
             /*
     (function () {

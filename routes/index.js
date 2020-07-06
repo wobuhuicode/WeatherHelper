@@ -15,12 +15,12 @@ router.get('/getCityName', function (req, res, next) {
     response.on('data', data => {
       let my = JSON.parse(data);
       res.json(my);
-    })
-  })
+    });
+  });
 
   httpReq.on('error', err => {
     console.log(err.message);
-  })
+  });
 });
 
 router.get('/get24', function (req, res, next) {
@@ -30,12 +30,12 @@ router.get('/get24', function (req, res, next) {
     res1.setEncoding('utf-8');
     res1.on('data', chunk => {
       hourlyData += chunk;
-    })
+    });
     res1.on('end', ()=>{
       res.json(JSON.parse(hourlyData));
-    })
+    });
   });
-})
+});
 
 router.get("/weather", (req, res) => {
   let url = "https://api.seniverse.com/v3/weather/now.json?key=SuGIvEHwK8b1Ed0nY&location=" + req.query.cityID + "&language=zh-Hans&unit=c";
@@ -46,30 +46,26 @@ router.get("/weather", (req, res) => {
       weatherData += chunk;
     });
     res1.on('end', () => {
-      res.json(JSON.parse(weatherData))
+      res.json(JSON.parse(weatherData));
     });
-  })
-})
+  });
+});
 
 router.get("/weatherDaily", (req, res) => {
   let url = "https://api.seniverse.com/v3/weather/daily.json?key=SuGIvEHwK8b1Ed0nY&location="+ req.query.cityID +"&language=zh-Hans&unit=c";
+  let url = "https://api.seniverse.com/v3/weather/daily.json?key=SuGIvEHwK8b1Ed0nY&location="+ req.query.cityID +"&language=zh-Hans&unit=c&start=0&days=4";
   let httpsRer = https.get(url, res2 => {
-    let weatherDat = "";
+    let weatherData = "";
     res2.setEncoding('utf-8');
     res2.on('data', chunk => {
-      weatherDat += chunk;
+      weatherData += chunk;
     });
     res2.on('end', () => {
-      res.json(JSON.parse(weatherDat))
+      res.json(JSON.parse(weatherData));
     });
-  })
-})
+  });
+});
 
-
-
-router.get("/3days", (req, res) => {
-  let url = "https://api.seniverse.com/v3/weather/daily.json?key=SuGIvEHwK8b1Ed0nY&location="+ req.query.cityID +"&language=zh-Hans&unit=c&start=1&days=3";
-})
 
 
 module.exports = router;
