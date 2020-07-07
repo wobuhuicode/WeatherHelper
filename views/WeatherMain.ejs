@@ -6,19 +6,24 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/weather.css" \>
 </head>
-<body>
+<body class="bg-light">
 <div style="display: flex; flex-direction: column; align-items: center; width: 100%">
-    <div class="card-frame" id="currentLocation">
-        <p class="text-center my-1" style="font-size: 20px">
-            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-cursor-fill mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
-            </svg>
-            当前定位：{{curLocation}}
-        </p>
+    <div class="card-frame card" id="currentLocation">
+        <div class="card-body py-0 bg-info text-white">
+            <p class="text-center my-1" style="font-size: 20px">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-cursor-fill mb-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
+                </svg>
+                当前定位：{{curLocation}}
+            </p>
+        </div>
     </div>
-    <div class="card-frame mt-0 card text-white bg-success mb-3" id="weather-pane">
+    <div class="card-frame card text-black bg-primary text-white" id="weather-pane" >
         <div class="card-header">
             {{curDate}}
+            <span style="position: absolute; right: 20px;">
+                {{curTime}}
+            </span>
         </div>
         <div class="card-body container" style="text-align: center">
             <div class="row">
@@ -40,29 +45,50 @@
             </div>
             <div class="row" style="border-top-style: solid; border-top-color: aliceblue">
                 <div class="col-4">
-                    {{tomorrow}}
+                    {{tomorrow.date}}
+                    <div style="height: 80px">
+                        <img class="mt-3" v-if="tomorrow.ifImageExist" v-bind:src= "tomorrow.imageSrc" />
+                    </div>
+                    {{tomorrow.tem}}
                 </div>
                 <div class="col-4">
-                    {{aftertomorrow}}
+                    {{aftertomorrow.date}}
+                    <div style="height: 80px">
+                        <img class="mt-3" v-if="aftertomorrow.ifImageExist" v-bind:src= "aftertomorrow.imageSrc" />
+                    </div>
+                    {{aftertomorrow.tem}}
                 </div>
                 <div class="col-4">
-                    {{bigaftertomorrow}}
+                    {{bigaftertomorrow.date}}
+                    <div style="height: 80px">
+                        <img class="mt-3" v-if="bigaftertomorrow.ifImageExist" v-bind:src= "bigaftertomorrow.imageSrc" />
+                    </div>
+                    {{bigaftertomorrow.tem}}
                 </div>
             </div>
         </div>
 
     </div>
-    <div class="container card-frame mt-0">
-        <div class="row">
-            <div class="col-10 text-center">
-                <p class="my-4"> 空气质量：{{quality}}</p>
+    <div class="card card-frame bg-success text-white">
+        <div class="card-header">
+            空气质量
+        </div>
+        <div class="card-body container">
+            <div class="row ml-3" style="font-size: 30px">
+                空气质量：良
             </div>
-            <div class="col-2">
-                <p class="my-0 text-center" style="font-size: 45px">99</p>
+            <div class="row ml-3" >
+                AQI：良
+            </div>
+            <div class="row ml-3">
+                PM2.5：良
+            </div>
+            <div class="row ml-3">
+                PM10：良
             </div>
         </div>
     </div>
-    <div class="card-frame mt-0">
+    <div class="card-frame">
         <div class="card text-center">
             <div class="card-header">
                 <ul class="nav nav-tabs card-header-tabs">
@@ -204,31 +230,47 @@
     );
 
     //weather
-    var curDate = new Date();
-    switch (curDate.getDay()) {
-        case 1: curDate.curWeekDay = "星期一"; break;
-        case 2: curDate.curWeekDay = "星期二"; break;
-        case 3: curDate.curWeekDay = "星期三"; break;
-        case 4: curDate.curWeekDay = "星期四"; break;
-        case 5: curDate.curWeekDay = "星期五"; break;
-        case 6: curDate.curWeekDay = "星期六"; break;
-        case 7: curDate.curWeekDay = "星期日"; break;
+    switch (date.getDay()) {
+        case 1: date.curWeekDay = "星期一"; break;
+        case 2: date.curWeekDay = "星期二"; break;
+        case 3: date.curWeekDay = "星期三"; break;
+        case 4: date.curWeekDay = "星期四"; break;
+        case 5: date.curWeekDay = "星期五"; break;
+        case 6: date.curWeekDay = "星期六"; break;
+        case 7: date.curWeekDay = "星期日"; break;
     }
-    curDate.toDateString();
+
+    date.toLocaleTimeString()
     var curTemperature;
     var weatherPane = new Vue({
         el: "#weather-pane",
         data: {
-            curDate: curDate.toLocaleDateString() + "   " + curDate.curWeekDay,
+            curDate: date.toLocaleDateString() + "   " + date.curWeekDay,
+            curTime: date.toLocaleTimeString().slice(0, -3),
             ifImageExist: false,
             imageSrc: "",
             curTemperature:"正在获取",
             curTemperatureRange:"正在获取",
             curWeather:"正在获取",
             curWind:"正在获取",
-            tomorrow:"正在获取",
-            aftertomorrow:"正在获取",
-            bigaftertomorrow:"正在获取"
+            tomorrow: {
+                ifImageExist: false,
+                imageSrc: "",
+                date: "正在获取",
+                tem: "正在获取"
+            },
+            aftertomorrow: {
+                ifImageExist: false,
+                imageSrc: "",
+                date: "正在获取",
+                tem: "正在获取"
+            },
+            bigaftertomorrow: {
+                ifImageExist: false,
+                imageSrc: "",
+                date: "正在获取",
+                tem: "正在获取"
+            },
         }
     });
 
@@ -259,10 +301,18 @@
                     weatherPane.curTemperatureRange=weatherJson.results[0].daily[0].low + "℃~" + weatherJson.results[0].daily[0].high + "℃";
                     weatherPane.curWeather = weatherJson.results[0].daily[0].text_day;
                     weatherPane.curWind=weatherJson.results[0].daily[0].wind_direction+"风";
-                    weatherPane.tomorrow=weatherJson.results[0].daily[1].date+"\n"+weatherJson.results[0].daily[1].low + "℃~" + weatherJson.results[0].daily[1].high + "℃";
-                    weatherPane.aftertomorrow=weatherJson.results[0].daily[2].date+"\n"+weatherJson.results[0].daily[2].low + "℃~" + weatherJson.results[0].daily[2].high + "℃";
-                    weatherPane.bigaftertomorrow=weatherJson.results[0].daily[3].date+"\n"+weatherJson.results[0].daily[3].low + "℃~" + weatherJson.results[0].daily[3].high + "℃";
-
+                    weatherPane.tomorrow.date=weatherJson.results[0].daily[1].date;
+                    weatherPane.aftertomorrow.date=weatherJson.results[0].daily[2].date;
+                    weatherPane.bigaftertomorrow.date=weatherJson.results[0].daily[3].date;
+                    weatherPane.tomorrow.tem=weatherJson.results[0].daily[1].text_day + weatherJson.results[0].daily[1].low + "℃~" + weatherJson.results[0].daily[1].high + "℃";
+                    weatherPane.aftertomorrow.tem=weatherJson.results[0].daily[2].text_day + weatherJson.results[0].daily[2].low + "℃~" + weatherJson.results[0].daily[2].high + "℃";
+                    weatherPane.bigaftertomorrow.tem=weatherJson.results[0].daily[3].text_day + weatherJson.results[0].daily[3].low + "℃~" + weatherJson.results[0].daily[3].high + "℃";
+                    weatherPane.tomorrow.imageSrc = "/images/" + weatherJson.results[0].daily[1].code_day + "@1x.png";
+                    weatherPane.aftertomorrow.imageSrc = "/images/" + weatherJson.results[0].daily[2].code_day + "@1x.png";
+                    weatherPane.bigaftertomorrow.imageSrc = "/images/" + weatherJson.results[0].daily[3].code_day + "@1x.png";
+                    weatherPane.tomorrow.ifImageExist = true;
+                    weatherPane.aftertomorrow.ifImageExist = true;
+                    weatherPane.bigaftertomorrow.ifImageExist = true;
                 })
         });
 
