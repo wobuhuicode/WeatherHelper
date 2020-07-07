@@ -67,4 +67,14 @@ router.get("/weatherDaily", (req, res) => {
 
 
 
+router.get("/weather", (req, res) => {
+  let url = "https://api.seniverse.com/v3/weather/now.json?key=SuGIvEHwK8b1Ed0nY&location=" + req.query.cityID + "&language=zh-Hans&unit=c";
+  let httpsReq = https.get(url, res1 => {
+    let weatherData = "";
+    res1.setEncoding('utf-8');
+    res1.on('data', chunk => { weatherData += chunk; });
+    res1.on('end', () => {res.json(JSON.parse(weatherData))});
+  })
+})
+
 module.exports = router;
