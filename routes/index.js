@@ -78,7 +78,7 @@ router.get("/weather", (req, res) => {
 })
 
 router.get("/air", (req, res) => {
-  let url = "https://api.seniverse.com/v3/air/now.json?key=SuGIvEHwK8b1Ed0nY&location="+ req.cityID +"&language=zh-Hans&scope=city";
+  let url = "https://api.seniverse.com/v3/air/now.json?key=SuGIvEHwK8b1Ed0nY&location="+ req.query.cityID +"&language=zh-Hans&scope=city";
   https.get(url, res1 => {
     let airRes = "";
     res1.setEncoding("utf-8");

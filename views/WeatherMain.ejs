@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="/stylesheets/weather.css" \>
 </head>
 <body class="bg-light">
+<div id="loading" class="loading">
+    <div class="spinner-border text-success mb-3" role="status" style="width: 60px; height: 60px">
+        <span class="sr-only">Loading...</span>
+    </div>
+    <p>
+        正在加载
+    </p>
+</div>
 <div style="display: flex; flex-direction: column; align-items: center; width: 100%">
     <div class="card-frame card" id="currentLocation">
         <div class="card-body py-0 bg-info text-white">
@@ -69,22 +77,19 @@
         </div>
 
     </div>
-    <div class="card card-frame bg-success text-white">
-        <div class="card-header">
-            空气质量
-        </div>
+    <div class="card card-frame bg-success text-white" id="aqiPane">
         <div class="card-body container">
             <div class="row ml-3" style="font-size: 30px">
-                空气质量：良
+                空气质量：{{airQuality.type}}
             </div>
             <div class="row ml-3" >
-                AQI：良
+                AQI：{{airQuality.AQI}}
             </div>
             <div class="row ml-3">
-                PM2.5：良
+                PM2.5：{{airQuality.pm25}}
             </div>
             <div class="row ml-3">
-                PM10：良
+                PM10：{{airQuality.pm10}}
             </div>
         </div>
     </div>
@@ -315,6 +320,38 @@
                     weatherPane.bigaftertomorrow.ifImageExist = true;
                 })
         });
+
+    //AQ
+    var aqiPane = new Vue({
+        el: "#aqiPane",
+        data: {
+            airQuality: {
+                type: '正在获取',
+                AQI: '',
+                pm25: '',
+                pm10: ''
+            }
+        }
+    })
+
+    cityName.then(
+        cityID => {
+            fetch("/air?cityID=" + cityID)
+            .then(
+                response => {
+                    return response.json();
+                }
+            ).then(
+                airJson => {
+                    aqiPane.airQuality.type = airJson.results[0].air.city.quality;
+                    aqiPane.airQuality.AQI = airJson.results[0].air.city.aqi;
+                    aqiPane.airQuality.pm25 = airJson.results[0].air.city.pm25;
+                    aqiPane.airQuality.pm10 = airJson.results[0].air.city.pm10;
+                    document.getElementById("loading").classList.add("loading-none")
+                }
+            )
+        }
+    )
 
             /*
     (function () {
