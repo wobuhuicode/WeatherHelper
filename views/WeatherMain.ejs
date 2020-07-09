@@ -57,6 +57,7 @@
                     <div style="height: 80px">
                         <img class="mt-3" v-if="tomorrow.ifImageExist" v-bind:src= "tomorrow.imageSrc" />
                     </div>
+                    {{tomorrow.type}}<br/>
                     {{tomorrow.tem}}
                 </div>
                 <div class="col-4">
@@ -64,6 +65,7 @@
                     <div style="height: 80px">
                         <img class="mt-3" v-if="aftertomorrow.ifImageExist" v-bind:src= "aftertomorrow.imageSrc" />
                     </div>
+                    {{aftertomorrow.type}}<br/>
                     {{aftertomorrow.tem}}
                 </div>
                 <div class="col-4">
@@ -71,6 +73,7 @@
                     <div style="height: 80px">
                         <img class="mt-3" v-if="bigaftertomorrow.ifImageExist" v-bind:src= "bigaftertomorrow.imageSrc" />
                     </div>
+                    {{bigaftertomorrow.type}}<br/>
                     {{bigaftertomorrow.tem}}
                 </div>
             </div>
@@ -262,19 +265,22 @@
                 ifImageExist: false,
                 imageSrc: "",
                 date: "正在获取",
-                tem: "正在获取"
+                tem: "正在获取",
+                type: ""
             },
             aftertomorrow: {
                 ifImageExist: false,
                 imageSrc: "",
                 date: "正在获取",
-                tem: "正在获取"
+                tem: "正在获取",
+                type: ""
             },
             bigaftertomorrow: {
                 ifImageExist: false,
                 imageSrc: "",
                 date: "正在获取",
-                tem: "正在获取"
+                tem: "正在获取",
+                type: ""
             },
         }
     });
@@ -309,9 +315,12 @@
                     weatherPane.tomorrow.date=weatherJson.results[0].daily[1].date;
                     weatherPane.aftertomorrow.date=weatherJson.results[0].daily[2].date;
                     weatherPane.bigaftertomorrow.date=weatherJson.results[0].daily[3].date;
-                    weatherPane.tomorrow.tem=weatherJson.results[0].daily[1].text_day + weatherJson.results[0].daily[1].low + "℃~" + weatherJson.results[0].daily[1].high + "℃";
-                    weatherPane.aftertomorrow.tem=weatherJson.results[0].daily[2].text_day + weatherJson.results[0].daily[2].low + "℃~" + weatherJson.results[0].daily[2].high + "℃";
-                    weatherPane.bigaftertomorrow.tem=weatherJson.results[0].daily[3].text_day + weatherJson.results[0].daily[3].low + "℃~" + weatherJson.results[0].daily[3].high + "℃";
+                    weatherPane.tomorrow.type = weatherJson.results[0].daily[1].text_day;
+                    weatherPane.aftertomorrow.type = weatherJson.results[0].daily[2].text_day;
+                    weatherPane.bigaftertomorrow.type = weatherJson.results[0].daily[3].text_day;
+                    weatherPane.tomorrow.tem=weatherJson.results[0].daily[1].low + "℃~" + weatherJson.results[0].daily[1].high + "℃";
+                    weatherPane.aftertomorrow.tem=weatherJson.results[0].daily[2].low + "℃~" + weatherJson.results[0].daily[2].high + "℃";
+                    weatherPane.bigaftertomorrow.tem=weatherJson.results[0].daily[3].low + "℃~" + weatherJson.results[0].daily[3].high + "℃";
                     weatherPane.tomorrow.imageSrc = "/images/" + weatherJson.results[0].daily[1].code_day + "@1x.png";
                     weatherPane.aftertomorrow.imageSrc = "/images/" + weatherJson.results[0].daily[2].code_day + "@1x.png";
                     weatherPane.bigaftertomorrow.imageSrc = "/images/" + weatherJson.results[0].daily[3].code_day + "@1x.png";
